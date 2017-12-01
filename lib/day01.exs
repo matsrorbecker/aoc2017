@@ -3,8 +3,7 @@ defmodule Day01 do
   def solve do
     {:ok, content} = File.read "./input/day01/input.txt"
     input = String.trim(content)
-    |> String.split("")
-    |> Enum.drop(-1)
+    |> String.split("", trim: true)
     |> Enum.map(&(String.to_integer(&1)))
     [first|_] = input
     first_answer = sum_matching input, 0, first
