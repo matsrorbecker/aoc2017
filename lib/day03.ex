@@ -1,32 +1,29 @@
 defmodule Day03 do
 
   def solve_first do
-    build_spiral(368078)
-    |> Enum.at(-1)
-    |> manhattan_distance({0, 0})
+    spiral = build_spiral(368078)
+    {pos, _} = Enum.find spiral, fn {_, val} -> val == 368078 end
+    manhattan_distance(pos, {0, 0})
   end
 
   defp build_spiral(positions) do
     # Initial values:
+    current_pos = {1, 0}
     facing = :east
-    spiral = [{1, 0}, {0, 0}]
+    spiral = %{{0, 0} => 1, {1, 0} => 2}
     count = 2
-    occupied = %{{1, 0} => true, {0, 0} => true}
     # Here we go
-    build_spiral(positions, facing, spiral, count, occupied)
-    |> Enum.reverse
+    build_spiral(positions, current_pos, facing, spiral, count)
   end
-  defp build_spiral(positions, _, spiral, count, _) when count == positions, do: spiral
-  defp build_spiral(positions, facing, spiral, count, occupied) do
-    [current_pos|_] = spiral
-    now_facing = get_direction facing, current_pos, occupied
+  defp build_spiral(positions, _, _, spiral, count) when count == positions, do: spiral
+  defp build_spiral(positions, current_pos, facing, spiral, count) do
+    now_facing = get_direction facing, current_pos, spiral
     new_pos = get_pos now_facing, current_pos
-    now_occupied = Map.put occupied, new_pos, true
-    build_spiral positions, now_facing, [new_pos|spiral], count + 1, now_occupied
+    build_spiral positions, new_pos, now_facing, Map.put(spiral, new_pos, count + 1), count + 1
   end
-  
-  defp get_direction(facing, current_pos, occupied) do
-    unless occupied[look_left(facing, current_pos)] do
+
+  defp get_direction(facing, current_pos, spiral) do
+    unless spiral[look_left(facing, current_pos)] do
       turn facing
     else
       facing
